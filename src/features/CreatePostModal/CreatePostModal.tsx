@@ -2,9 +2,6 @@
 
 import { useState } from 'react'
 import { Modal } from '../../shared/ui/Modal/Modal'
-import { Button } from '../../shared/ui/Button/Button'
-import { Input } from '../../shared/ui/Input/Input'
-import { Alert } from '../../shared/ui/Alert/Alert'
 import { LoadingSpinner } from '../../shared/ui/LoadingSpinner/LoadingSpinner'
 import { useCreatePostMutation } from '../../shared/api/postsApi'
 import { CheckCircle } from 'lucide-react'
@@ -36,7 +33,7 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
     }
 
     try {
-      const result = await createPost({
+      await createPost({
         title: title.trim(),
         body: body.trim(),
         userId: 1,
@@ -56,17 +53,20 @@ export function CreatePostModal({ isOpen, onClose, onPostCreated }: CreatePostMo
         setSuccess(false)
         onClose()
       }, 2000)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Ошибка при создании поста:', error)
       
       let errorMessage = 'Произошла ошибка при создании поста. Попробуйте еще раз.'
       
-      if (error?.data?.message) {
-        errorMessage = error.data.message
-      } else if (error?.message) {
-        errorMessage = error.message
-      } else if (error?.status) {
-        errorMessage = `Ошибка сервера: ${error.status}`
+      if (error && typeof error === 'object' && 'data' in error) {
+        const errorData = error.data as { message?: string }
+        if (errorData?.message) {
+          errorMessage = errorData.message
+        }
+      } else if (error && typeof error === 'object' && 'message' in error) {
+        errorMessage = (error as { message: string }).message
+      } else if (error && typeof error === 'object' && 'status' in error) {
+        errorMessage = `Ошибка сервера: ${(error as { status: number }).status}`
       }
       
       setError(errorMessage)

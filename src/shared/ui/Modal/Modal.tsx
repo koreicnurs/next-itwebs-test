@@ -1,16 +1,14 @@
-import { ReactNode, useEffect, useState } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { clsx } from 'clsx'
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
   title?: string
   children: ReactNode
-  className?: string
 }
 
-export function Modal({ isOpen, onClose, title, children, className }: ModalProps) {
+export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
